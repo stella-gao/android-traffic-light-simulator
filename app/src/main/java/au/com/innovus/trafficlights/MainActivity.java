@@ -72,28 +72,6 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
     }
 
@@ -150,17 +128,15 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         if (timeGreen < 0) timeGreen = seekBars[2].getProgress();
 
         if (timeGreen > 0) currentColor = 0;
+        if (timeGreen == 0 && timeYellow > 0) currentColor = 1;
+        if (timeGreen == 0 && timeYellow == 0 && timeRed > 0)  currentColor = 2;
 
-        if (timeGreen == 0 && timeYellow > 0){
-            currentColor = 1;
-        }if (timeGreen == 0 && timeYellow == 0){
-            currentColor = 2;
-        }
         running = true;
         Log.d(TAG, "StartSimulation Current Color " + currentColor);
         int total = timeGreen + timeRed + timeYellow;
 
         if (total == 0) {
+            timeRed = timeYellow = timeGreen = -1;
             Toast.makeText(this, "Select duration", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -297,7 +273,6 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
             super.onPostExecute(aVoid);
             Log.d(TAG, "onPosteExecute()");
             stopSimulation();
-
         }
     }
 
@@ -312,7 +287,6 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-
         if (running) {
             outState.putInt("time_red", timeRed);
             outState.putInt("time_yellow", timeYellow);

@@ -23,25 +23,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/gradient_box"
-                android:layout_margin="50dp"
-                android:gravity="center_vertical|center_horizontal">
+                android:gravity="center_vertical|center_horizontal"
+                android:layout_marginLeft="40dp"
+                android:layout_marginRight="40dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp">
 
                 <View
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:background="@drawable/circle_black"
                     android:id="@+id/red_view_traffic"
                     android:paddingBottom="10dp"></View>
                 <View
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:background="@drawable/circle_black"
                     android:id="@+id/yellow_view_traffic"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"></View>
                 <View
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:background="@drawable/circle_black"
                     android:id="@+id/green_view_traffic"
                     android:paddingTop="5dp"></View>
@@ -55,29 +58,30 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center_vertical|center_horizontal">
+            android:gravity="left">
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/textView_timer"
                 android:textSize="30sp"
                 android:padding="20dp"
                 android:background="@drawable/gradient_box"
-                android:textColor="#ff00b100"
-                android:layout_marginLeft="20dp"
+                android:textColor="@android:color/white"
                 android:layout_marginRight="20dp"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_horizontal"
-                android:visibility="visible" />
+                android:visibility="visible"
+                android:minWidth="100dp"
+                android:layout_marginTop="20dp" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/image_arrow"
                 android:src="@mipmap/yellow_arrow"
-                android:layout_margin="10dp"
-                android:visibility="invisible" />
+                android:visibility="invisible"
+                android:layout_marginRight="75dp" />
         </LinearLayout>
     </LinearLayout>
 
