@@ -115,6 +115,8 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         findViewById(R.id.button_start).setEnabled(true);
         findViewById(R.id.button_stop).setEnabled(false);
         imageArrow.setVisibility(View.INVISIBLE);
+        ((TextView) (findViewById(R.id.textView_timer))).setVisibility(View.INVISIBLE);
+
 
         ((GradientDrawable) (findViewById(R.id.green_view).getBackground())).setColor(Color.parseColor("#4CAF50"));
         ((GradientDrawable) (findViewById(R.id.yellow_view).getBackground())).setColor(Color.parseColor("#FFEB3B"));
@@ -130,6 +132,10 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
             return;
         }
 
+
+        ((GradientDrawable) (findViewById(R.id.green_view).getBackground())).setColor(Color.parseColor("#4CAF50"));
+        ((GradientDrawable) (findViewById(R.id.yellow_view).getBackground())).setColor(Color.parseColor("#000000"));
+        ((GradientDrawable) (findViewById(R.id.red_view).getBackground())).setColor(Color.parseColor("#000000"));
         imageArrow.setImageResource(R.mipmap.green_arrow);
         imageArrow.setVisibility(View.VISIBLE);
         for (SeekBar s : seekBars){
@@ -138,7 +144,7 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         findViewById(R.id.button_start).setEnabled(false);
         findViewById(R.id.button_stop).setEnabled(true);
 
-
+        ((TextView) (findViewById(R.id.textView_timer))).setVisibility(View.VISIBLE);
         ((TextView) (findViewById(R.id.textView_timer))).setText(""+timeGreen);
         Log.d(TAG, "total  "+ total);
 
