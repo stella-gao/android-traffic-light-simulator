@@ -19,6 +19,7 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
     private static String TAG = MainActivity.class.getSimpleName();
     int timeRed, timeYellow, timeGreen;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
