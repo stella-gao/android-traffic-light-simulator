@@ -50,7 +50,7 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
             boolean run = savedInstanceState.getBoolean("running", false);
             if (run) {
                 resumed = true;
-                Log.d(TAG, "onStart()");
+                Log.d(TAG, "onCreate()");
                 timeGreen = savedInstanceState.getInt("time_green");
                 timeRed = savedInstanceState.getInt("time_red");
                 timeYellow = savedInstanceState.getInt("time_yellow");
@@ -69,14 +69,6 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
                 " timeGreen "+ timeGreen);
         startSimulation();
 
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-
-        Log.d(TAG, "onRestore");
-        super.onRestoreInstanceState(savedInstanceState);
-        Log.d(TAG, "onRestore");
     }
 
     @Override
@@ -122,10 +114,10 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 
     public void onClick(View v) {
         if (v.getId() == R.id.button_start) {
-            Log.d(TAG, "start");
+            Log.d(TAG, "ButtonStart");
             startSimulation();
         } else {
-            Log.d(TAG, "Stop");
+            Log.d(TAG, "ButtonStop");
             stopSimulation();
         }
     }
@@ -145,7 +137,6 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         imageArrow.setVisibility(View.INVISIBLE);
         ((TextView) (findViewById(R.id.textView_timer))).setText("");
 
-
         ((GradientDrawable) (findViewById(R.id.green_view_traffic).getBackground())).setColor(Color.parseColor("#000000"));
         ((GradientDrawable) (findViewById(R.id.yellow_view_traffic).getBackground())).setColor(Color.parseColor("#000000"));
         ((GradientDrawable) (findViewById(R.id.red_view_traffic).getBackground())).setColor(Color.parseColor("#000000"));
@@ -158,8 +149,15 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         if (timeYellow < 0) timeYellow = seekBars[1].getProgress();
         if (timeGreen < 0) timeGreen = seekBars[2].getProgress();
 
+        if (timeGreen > 0) currentColor = 0;
+
+        if (timeGreen == 0 && timeYellow > 0){
+            currentColor = 1;
+        }if (timeGreen == 0 && timeYellow == 0){
+            currentColor = 2;
+        }
         running = true;
-        Log.d(TAG, "StartSimulation");
+        Log.d(TAG, "StartSimulation Current Color " + currentColor);
         int total = timeGreen + timeRed + timeYellow;
 
         if (total == 0) {
@@ -231,7 +229,7 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
                     e.printStackTrace();
                 }
                 total--;
-                Log.d(TAG, "BACKGORUND");
+                //Log.d(TAG, "BACKGORUND");
 
                 if (total >= tYellow + tRed) {
                     tGreen--;
