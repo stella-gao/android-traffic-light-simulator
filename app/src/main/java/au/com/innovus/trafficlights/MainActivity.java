@@ -23,6 +23,7 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
     private static String TAG = MainActivity.class.getSimpleName();
     int timeRed, timeYellow, timeGreen;
     private ImageView imageArrow;
+    private RunSimlulatorTask simlulatorTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +105,7 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 
     private void stopSimulation(){
 
+        simlulatorTask.cancel(true);
         timeGreen = timeYellow = timeRed = 0;
         for (SeekBar s : seekBars){
             s.setEnabled(true);
@@ -126,7 +128,7 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         ((TextView) (findViewById(R.id.textView_timer))).setText(""+total);
         Log.d(TAG, "total  "+ total);
 
-        RunSimlulatorTask simlulatorTask = new RunSimlulatorTask();
+        simlulatorTask = new RunSimlulatorTask();
         simlulatorTask.execute(total);
 
     }
@@ -137,7 +139,7 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         protected Void doInBackground(Integer... params) {
 
             int total = params[0];
-            while (total > 0){
+            while (total > 0 && !isCancelled()){
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
