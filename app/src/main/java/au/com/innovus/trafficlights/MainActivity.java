@@ -22,29 +22,62 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 
     private SeekBar[] seekBars;
     private static String TAG = MainActivity.class.getSimpleName();
-    int timeRed, timeYellow, timeGreen;
+    int timeRed = -1, timeYellow = -1 , timeGreen = -1;
     private ImageView imageArrow;
     private RunSimlulatorTask simlulatorTask;
+    private boolean running = false;
+    //current 0 green, 1 yellow, 2, red
+    private int currentColor = 0;
+    private boolean resumed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-       // ((GradientDrawable) (findViewById(R.id.green_view).getBackground())).setColor(Color.GREEN);
-       // ((GradientDrawable) (findViewById(R.id.yellow_view).getBackground())).setColor(Color.YELLOW);
+        timeRed = timeYellow = timeGreen = -1;
         imageArrow = (ImageView) findViewById(R.id.image_arrow);
         seekBars = new SeekBar[]{(SeekBar) findViewById(R.id.seekBar_red),
                 (SeekBar) findViewById(R.id.seekBar_yellow),
                 (SeekBar) findViewById(R.id.seekBar_green)
         };
 
-        for (int i =0; i < seekBars.length; i++){
+        for (int i = 0; i < seekBars.length; i++) {
             seekBars[i].setMax(10);
             seekBars[i].setOnSeekBarChangeListener(this);
         }
+
+        if (savedInstanceState != null) {
+            boolean run = savedInstanceState.getBoolean("running", false);
+            if (run) {
+                resumed = true;
+                Log.d(TAG, "onStart()");
+                timeGreen = savedInstanceState.getInt("time_green");
+                timeRed = savedInstanceState.getInt("time_red");
+                timeYellow = savedInstanceState.getInt("time_yellow");
+                currentColor = savedInstanceState.getInt("current");
+                running = false;
+                startSimulation();
+            }
+        }
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d(TAG, "onRestart() " + running + " timeRed " +timeRed+
+                " timeYellow "+ timeYellow+
+                " timeGreen "+ timeGreen);
+        startSimulation();
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+
+        Log.d(TAG, "onRestore");
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.d(TAG, "onRestore");
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -70,13 +103,6 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        if (seekBar.getId() == findViewById(R.id.seekBar_red).getId()){
-            timeRed = progress;
-        }else if(seekBar.getId() == findViewById(R.id.seekBar_yellow).getId()){
-            timeYellow = progress;
-        }else{
-            timeGreen = progress;
-        }
     }
 
     @Override
@@ -85,33 +111,35 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
-        if (seekBar.getId() == findViewById(R.id.seekBar_red).getId()){
+        if (seekBar.getId() == findViewById(R.id.seekBar_red).getId()) {
             Log.d(TAG, "RED");
-        }else if(seekBar.getId() == findViewById(R.id.seekBar_yellow).getId()){
+        } else if (seekBar.getId() == findViewById(R.id.seekBar_yellow).getId()) {
             Log.d(TAG, "YELLOW");
-        }else{
+        } else {
             Log.d(TAG, "GREEN");
         }
     }
 
-    public void onClick(View v){
-        if (v.getId() == R.id.button_start){
+    public void onClick(View v) {
+        if (v.getId() == R.id.button_start) {
             Log.d(TAG, "start");
             startSimulation();
-        }else{
+        } else {
             Log.d(TAG, "Stop");
             stopSimulation();
         }
     }
 
-    private void stopSimulation(){
+    private void stopSimulation() {
 
+        running = false;
         simlulatorTask.cancel(true);
-        timeGreen = timeYellow = timeRed = 0;
-        for (SeekBar s : seekBars){
+        for (SeekBar s : seekBars) {
             s.setEnabled(true);
             s.setProgress(0);
         }
+
+        timeRed = timeYellow = timeGreen = -1;
         findViewById(R.id.button_start).setEnabled(true);
         findViewById(R.id.button_stop).setEnabled(false);
         imageArrow.setVisibility(View.INVISIBLE);
@@ -123,8 +151,15 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         ((GradientDrawable) (findViewById(R.id.red_view_traffic).getBackground())).setColor(Color.parseColor("#000000"));
 
     }
-    private void startSimulation(){
 
+    private void startSimulation() {
+
+        if (timeRed < 0) timeRed = seekBars[0].getProgress();
+        if (timeYellow < 0) timeYellow = seekBars[1].getProgress();
+        if (timeGreen < 0) timeGreen = seekBars[2].getProgress();
+
+        running = true;
+        Log.d(TAG, "StartSimulation");
         int total = timeGreen + timeRed + timeYellow;
 
         if (total == 0) {
@@ -132,27 +167,55 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
             return;
         }
 
-        ((GradientDrawable) (findViewById(R.id.green_view_traffic).getBackground())).setColor(Color.parseColor("#4CAF50"));
-        ((GradientDrawable) (findViewById(R.id.yellow_view_traffic).getBackground())).setColor(Color.parseColor("#000000"));
-        ((GradientDrawable) (findViewById(R.id.red_view_traffic).getBackground())).setColor(Color.parseColor("#000000"));
-        imageArrow.setImageResource(R.mipmap.green_arrow);
+        int currentTime = 0;
+        int currentArrow =0;
+        String colorGreen = "", colorYellow = "", colorRed = "";
+        //red
+        if (currentColor == 0){
+            currentTime = timeGreen;
+            colorGreen = "#4CAF50";
+            colorYellow = "#000000";
+            colorRed = "#000000";
+            currentArrow = R.mipmap.green_arrow;
+
+        //yellow
+        }else if (currentColor == 1){
+            currentTime = timeYellow;
+            colorGreen = "#000000";
+            colorYellow = "#FFEB3B";
+            colorRed = "#000000";
+            currentArrow = R.mipmap.yellow_arrow;
+        //red
+        }else{
+            currentTime = timeRed;
+            colorGreen = "#000000";
+            colorYellow = "#000000";
+            colorRed = "#FFFF0000";
+            currentArrow = R.mipmap.red_arrow;
+        }
+
+        ((GradientDrawable) (findViewById(R.id.green_view_traffic).getBackground())).setColor(Color.parseColor(colorGreen));
+        ((GradientDrawable) (findViewById(R.id.yellow_view_traffic).getBackground())).setColor(Color.parseColor(colorYellow));
+        ((GradientDrawable) (findViewById(R.id.red_view_traffic).getBackground())).setColor(Color.parseColor(colorRed));
+        ((TextView) (findViewById(R.id.textView_timer))).setText("" + currentTime);
+
+        imageArrow.setImageResource(currentArrow);
         imageArrow.setVisibility(View.VISIBLE);
-        for (SeekBar s : seekBars){
+        for (SeekBar s : seekBars) {
             s.setEnabled(false);
         }
         findViewById(R.id.button_start).setEnabled(false);
         findViewById(R.id.button_stop).setEnabled(true);
 
         ((TextView) (findViewById(R.id.textView_timer))).setVisibility(View.VISIBLE);
-        ((TextView) (findViewById(R.id.textView_timer))).setText(""+timeGreen);
-        Log.d(TAG, "total  "+ total);
+
+        Log.d(TAG, "total  " + total);
 
         simlulatorTask = new RunSimlulatorTask();
         simlulatorTask.execute(total, timeGreen, timeYellow, timeRed);
-
     }
 
-    public class RunSimlulatorTask extends AsyncTask<Integer, Integer, Void>{
+    public class RunSimlulatorTask extends AsyncTask<Integer, Integer, Void> {
 
         @Override
         protected Void doInBackground(Integer... params) {
@@ -161,21 +224,22 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
             int tGreen = params[1];
             int tYellow = params[2];
             int tRed = params[3];
-            while (total > 0 && !isCancelled()){
+            while (total > 0 && !isCancelled()) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 total--;
+                Log.d(TAG, "BACKGORUND");
 
-                if (total >= tYellow + tRed){
+                if (total >= tYellow + tRed) {
                     tGreen--;
                     publishProgress(tGreen, 0);
-                } else if (total >= tRed && total < tYellow + tRed){
+                } else if (total >= tRed && total < tYellow + tRed) {
                     tYellow--;
                     publishProgress(tYellow, 1);
-                }else{
+                } else {
                     tRed--;
                     publishProgress(tRed, 2);
                 }
@@ -188,12 +252,15 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
             super.onProgressUpdate(values);
 
             int current = values[1];
-            ((TextView) (findViewById(R.id.textView_timer))).setText(""+values[0]);
 
-            switch (current){
+            ((TextView) (findViewById(R.id.textView_timer))).setText("" + values[0]);
+
+            switch (current) {
                 //Green
                 case 0:
+                    timeGreen = values[0];
                     imageArrow.setImageResource(R.mipmap.green_arrow);
+                    currentColor = 0;
                     //((GradientDrawable) (findViewById(R.id.green_view).getBackground())).setColor(Color.parseColor("#4CAF50"));
                     ((GradientDrawable) (findViewById(R.id.green_view_traffic).getBackground())).setColor(Color.parseColor("#4CAF50"));
                     //((GradientDrawable) (findViewById(R.id.yellow_view).getBackground())).setColor(Color.parseColor("#000000"));
@@ -203,7 +270,9 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
                     break;
                 //Yellow
                 case 1:
+                    timeYellow = values[0];
                     imageArrow.setImageResource(R.mipmap.yellow_arrow);
+                    currentColor =1;
                     //((GradientDrawable) (findViewById(R.id.yellow_view).getBackground())).setColor(Color.parseColor("#FFEB3B"));
                     ((GradientDrawable) (findViewById(R.id.yellow_view_traffic).getBackground())).setColor(Color.parseColor("#FFEB3B"));
                     //((GradientDrawable) (findViewById(R.id.green_view).getBackground())).setColor(Color.parseColor("#000000"));
@@ -212,7 +281,9 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
                     ((GradientDrawable) (findViewById(R.id.red_view_traffic).getBackground())).setColor(Color.parseColor("#000000"));
                     break;
                 case 2:
+                    timeRed = values[0];
                     imageArrow.setImageResource(R.mipmap.red_arrow);
+                    currentColor = 2;
                     //((GradientDrawable) (findViewById(R.id.red_view).getBackground())).setColor(Color.parseColor("#FFFF0000"));
                     ((GradientDrawable) (findViewById(R.id.red_view_traffic).getBackground())).setColor(Color.parseColor("#FFFF0000"));
                     //((GradientDrawable) (findViewById(R.id.green_view).getBackground())).setColor(Color.parseColor("#000000"));
@@ -222,10 +293,38 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
                     break;
             }
         }
+
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            Log.d(TAG, "onPosteExecute()");
             stopSimulation();
+
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (simlulatorTask != null && !simlulatorTask.isCancelled()) {
+            Log.d(TAG, "onStop()");
+            simlulatorTask.cancel(true);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+
+        if (running) {
+            outState.putInt("time_red", timeRed);
+            outState.putInt("time_yellow", timeYellow);
+            outState.putInt("time_green", timeGreen);
+            outState.putBoolean("running", running);
+            outState.putInt("current", currentColor);
+            Log.d(TAG, "onSavedInstance() " + running + " timeRed " +timeRed+
+            " timeYellow "+ timeYellow+
+            " timeGreen "+ timeGreen);
+        }
+        super.onSaveInstanceState(outState);
     }
 }
