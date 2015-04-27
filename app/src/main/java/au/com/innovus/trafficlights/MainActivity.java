@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeListener {
@@ -117,6 +118,11 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
     }
     private void startSimulation(){
 
+        int total = timeGreen + timeRed + timeYellow;
+
+        if (total == 0) {
+            Toast.makeText(this, "Select duration", Toast.LENGTH_SHORT).show();
+        }
 
         for (SeekBar s : seekBars){
             s.setEnabled(false);
@@ -124,12 +130,12 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         findViewById(R.id.button_start).setEnabled(false);
         findViewById(R.id.button_stop).setEnabled(true);
 
-        int total = timeGreen + timeRed + timeYellow;
-        ((TextView) (findViewById(R.id.textView_timer))).setText(""+total);
+
+        ((TextView) (findViewById(R.id.textView_timer))).setText(""+timeGreen);
         Log.d(TAG, "total  "+ total);
 
         simlulatorTask = new RunSimlulatorTask();
-        simlulatorTask.execute(total);
+        simlulatorTask.execute(total, timeGreen, timeYellow, timeRed);
 
     }
 
@@ -139,6 +145,9 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         protected Void doInBackground(Integer... params) {
 
             int total = params[0];
+            int tGreen = params[1];
+            int tYellow = params[2];
+            int tRed = params[3];
             while (total > 0 && !isCancelled()){
                 try {
                     Thread.sleep(1000);
@@ -146,7 +155,17 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
                     e.printStackTrace();
                 }
                 total--;
-                publishProgress(total);
+
+                if (total >= tYellow + tRed){
+                    tGreen--;
+                    publishProgress(tGreen, 0);
+                } else if (total >= tRed && total < tYellow + tRed){
+                    tYellow--;
+                    publishProgress(tYellow, 1);
+                }else{
+                    tRed--;
+                    publishProgress(tRed, 2);
+                }
             }
             return null;
         }
@@ -154,7 +173,23 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
+
+            int current = values[1];
             ((TextView) (findViewById(R.id.textView_timer))).setText(""+values[0]);
+
+            switch (current){
+                //Green
+                case 0:
+                    imageArrow.setImageResource(R.mipmap.green_arrow);
+                    break;
+                //Yellow
+                case 1:
+                    imageArrow.setImageResource(R.mipmap.yellow_arrow);
+                    break;
+                case 2:
+                    imageArrow.setImageResource(R.mipmap.red_arrow);
+                    break;
+            }
         }
 
         @Override
