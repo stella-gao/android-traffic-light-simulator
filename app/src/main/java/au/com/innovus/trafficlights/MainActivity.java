@@ -114,6 +114,11 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         }
         findViewById(R.id.button_start).setEnabled(true);
         findViewById(R.id.button_stop).setEnabled(false);
+        imageArrow.setVisibility(View.INVISIBLE);
+
+        ((GradientDrawable) (findViewById(R.id.green_view).getBackground())).setColor(Color.parseColor("#4CAF50"));
+        ((GradientDrawable) (findViewById(R.id.yellow_view).getBackground())).setColor(Color.parseColor("#FFEB3B"));
+        ((GradientDrawable) (findViewById(R.id.red_view).getBackground())).setColor(Color.parseColor("#FFFF0000"));
 
     }
     private void startSimulation(){
@@ -122,8 +127,11 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 
         if (total == 0) {
             Toast.makeText(this, "Select duration", Toast.LENGTH_SHORT).show();
+            return;
         }
 
+        imageArrow.setImageResource(R.mipmap.green_arrow);
+        imageArrow.setVisibility(View.VISIBLE);
         for (SeekBar s : seekBars){
             s.setEnabled(false);
         }
@@ -181,13 +189,22 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
                 //Green
                 case 0:
                     imageArrow.setImageResource(R.mipmap.green_arrow);
+                    ((GradientDrawable) (findViewById(R.id.green_view).getBackground())).setColor(Color.parseColor("#4CAF50"));
+                    ((GradientDrawable) (findViewById(R.id.yellow_view).getBackground())).setColor(Color.parseColor("#000000"));
+                    ((GradientDrawable) (findViewById(R.id.red_view).getBackground())).setColor(Color.parseColor("#000000"));
                     break;
                 //Yellow
                 case 1:
                     imageArrow.setImageResource(R.mipmap.yellow_arrow);
+                    ((GradientDrawable) (findViewById(R.id.green_view).getBackground())).setColor(Color.parseColor("#000000"));
+                    ((GradientDrawable) (findViewById(R.id.yellow_view).getBackground())).setColor(Color.parseColor("#FFEB3B"));
+                    ((GradientDrawable) (findViewById(R.id.red_view).getBackground())).setColor(Color.parseColor("#000000"));
                     break;
                 case 2:
                     imageArrow.setImageResource(R.mipmap.red_arrow);
+                    ((GradientDrawable) (findViewById(R.id.green_view).getBackground())).setColor(Color.parseColor("#000000"));
+                    ((GradientDrawable) (findViewById(R.id.yellow_view).getBackground())).setColor(Color.parseColor("#000000"));
+                    ((GradientDrawable) (findViewById(R.id.red_view).getBackground())).setColor(Color.parseColor("#FFFF0000"));
                     break;
             }
         }
